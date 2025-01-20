@@ -1,29 +1,33 @@
-package com.duccionarbone.cleanarchitectured
+package com.duccionarbone.cleanarchitectured.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.activity.viewModels
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.duccionarbone.cleanarchitectured.navigation.AppNavigation
 import com.duccionarbone.cleanarchitectured.ui.theme.CleanTheme
+import com.duccionarbone.presentation.home.HomeViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val homeViewModel: HomeViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            CleanTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+            CleanTheme(darkTheme = true) {
+                Scaffold{ innerPadding ->
+                    AppNavigation(innerPadding, homeViewModel)
                 }
             }
         }
