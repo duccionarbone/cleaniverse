@@ -41,7 +41,10 @@ fun convertToHttps(httpUrl: HttpUrl): HttpUrl {
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun SharedTransitionScope.HomeScreen(paddingValues: PaddingValues, uiState: UiState, navController: NavHostController, imageLoader: ImageLoader, animatedVisibilityScope: AnimatedVisibilityScope){
+fun SharedTransitionScope.HomeScreen(paddingValues: PaddingValues, navController: NavHostController, imageLoader: ImageLoader, animatedVisibilityScope: AnimatedVisibilityScope){
+
+    val homeViewModel = hiltViewModel<HomeViewModel>()
+    val uiState by homeViewModel.uiState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -100,8 +103,7 @@ fun SharedTransitionScope.NasaCard(
     animatedVisibilityScope: AnimatedVisibilityScope
 ) {
 
-    val httpsUrl = nasaPhoto.links[0].href
-
+    val httpsUrl = nasaPhoto.links?.get(0)?.href ?: ""
 
     Box(modifier = Modifier
         .height(200.dp)
@@ -122,7 +124,7 @@ fun SharedTransitionScope.NasaCard(
             contentDescription = nasaPhoto.data?.get(0)?.title,
             modifier = Modifier
                 .sharedElement(
-                    rememberSharedContentState(key = "image{${nasaPhoto.href}"),
+                    rememberSharedContentState(key = "image{${nasaPhoto.href ?: ""}"),
                     animatedVisibilityScope = animatedVisibilityScope,
                 )
                 .height(200.dp)

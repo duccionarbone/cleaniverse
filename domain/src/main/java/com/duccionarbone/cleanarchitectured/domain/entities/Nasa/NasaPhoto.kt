@@ -10,40 +10,40 @@ data class NasaPhotos(
 
 @Serializable
 data class Collection(
-    val version: String,
-    val href: String,
-    val items: List<NasaPhoto>,
-    val metadata: Metadata,
-    val links: List<Link>
+    val version: String?,
+    val href: String?,
+    val items: List<NasaPhoto>?,
+    val metadata: Metadata?,
+    val links: List<Link>?
 )
 
 @Serializable
 data class NasaPhoto(
-    val href: String,
+    val href: String?,
     val data: List<Data>?,
-    val links: List<Link>
+    val links: List<Link>?
 )
 @Serializable
 data class Data(
-    val center: String,
-    val title: String,
-    val nasa_id: String,
-    val date_created: String,
-    val keywords: List<String>,
-    val media_type: String,
-    val description_508: String,
-    val secondary_creator: String,
-    val description: String
+    val center: String?,
+    val title: String?,
+    val nasa_id: String?,
+    val date_created: String?,
+    val keywords: List<String>?,
+    val media_type: String?,
+    val description_508: String?,
+    val secondary_creator: String?,
+    val description: String?
 )
 
 @Serializable
 data class Link(
-    val href: String,
-    val rel: String,
-    val render: String
+    val href: String?,
+    val rel: String?,
+    val render: String?
 )
 
 @Serializable
 data class Metadata(
-    val total_hits: Int
+    val total_hits: Int?
 )

@@ -2,27 +2,24 @@ package com.duccionarbone.cleanarchitectured.navigation
 
 import android.content.Context
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.duccionarbone.cleanarchitectured.domain.entities.Nasa.NasaPhoto
-import com.duccionarbone.presentation.base.UiState
-import com.duccionarbone.presentation.details.DetailScreen
-import com.duccionarbone.presentation.home.HomeViewModel
-import kotlinx.serialization.json.Json
-import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.ui.platform.LocalContext
 import coil.ImageLoader
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
+import com.duccionarbone.cleanarchitectured.domain.entities.Nasa.NasaPhoto
+import com.duccionarbone.presentation.details.DetailScreen
 import com.duccionarbone.presentation.home.HomeScreen
+import com.duccionarbone.presentation.home.HomeViewModel
+import kotlinx.serialization.json.Json
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
@@ -53,24 +50,23 @@ fun AppNavigation(paddingValues: PaddingValues, homeViewModel: HomeViewModel) {
 
     val imageLoader = createImageLoader(LocalContext.current)
 
-
-    LaunchedEffect(Unit){
-        homeViewModel.updateFiltersAndCallApi("mars")
-    }
-
     SharedTransitionLayout {
         NavHost(navController, startDestination = "home") {
 
             composable("home") {
-                HomeScreen(paddingValues, uiState, navController, imageLoader, this)
+                HomeScreen(paddingValues, navController, imageLoader, this)
             }
             composable("detail/{nasaPhotoJson}") { backStackEntry ->
                 val serializedPhoto = backStackEntry.arguments?.getString("nasaPhotoJson")?.replace("$$$", "/")
                 val nasaPhoto: NasaPhoto? = serializedPhoto?.let {
-                    Json.decodeFromString<NasaPhoto>(it)
+                    try {
+                        Json.decodeFromString<NasaPhoto>(it)
+                    } catch (e: Exception) {
+                        null
+                    }
                 }
                 if (nasaPhoto != null) {
-                    DetailScreen(paddingValues, nasaPhoto, animatedVisibilityScope = this, imageLoader = imageLoader)
+                    DetailScreen(paddingValues, navController, nasaPhoto, animatedVisibilityScope = this, imageLoader = imageLoader)
                 }
             }
         }

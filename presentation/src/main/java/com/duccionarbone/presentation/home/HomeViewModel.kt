@@ -1,6 +1,7 @@
 package com.duccionarbone.presentation.home
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.duccionarbone.cleanarchitectured.domain.entities.GitHub.User
 import com.duccionarbone.cleanarchitectured.domain.entities.Nasa.MarsPhoto
@@ -13,9 +14,7 @@ import com.duccionarbone.cleanarchitectured.domain.usecases.GetUsersUseCase
 import com.duccionarbone.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,7 +37,12 @@ class HomeViewModel @Inject constructor(
     private val _nasaPhotos = MutableStateFlow<List<NasaPhoto>>(emptyList())
     val nasaPhotos: StateFlow<List<NasaPhoto>> = _nasaPhotos
 
-    var actualQuery = ""
+   var radioOptions = listOf("Mars", "Moon", "Earth")
+   var selectedOption = mutableStateOf(radioOptions[0])
+
+    init {
+        updateFiltersAndCallApi(0, "Mars")
+    }
 
     fun getUsers() {
         viewModelScope.launch {
@@ -111,9 +115,8 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateFiltersAndCallApi(query: String) {
-        actualQuery = query
-        getNasaPhotos(query, "image")
+    fun updateFiltersAndCallApi(index: Int, query: String) {
+        selectedOption = mutableStateOf(radioOptions[index])
+        getNasaPhotos("$query planet", "image")
     }
-
 }
