@@ -13,7 +13,9 @@ import com.duccionarbone.cleanarchitectured.domain.usecases.GetUsersUseCase
 import com.duccionarbone.presentation.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -35,6 +37,8 @@ class HomeViewModel @Inject constructor(
 
     private val _nasaPhotos = MutableStateFlow<List<NasaPhoto>>(emptyList())
     val nasaPhotos: StateFlow<List<NasaPhoto>> = _nasaPhotos
+
+    var actualQuery = ""
 
     fun getUsers() {
         viewModelScope.launch {
@@ -98,13 +102,18 @@ class HomeViewModel @Inject constructor(
             safeApiCall(
                 apiCall = { getNasaPhotosUseCase(query, mediaType) },
                 onSuccess = { nasaPhotos ->
-                    _nasaPhotos.update { nasaPhotos?.collection?.items ?: emptyList() }
+                    _nasaPhotos.value =  nasaPhotos?.collection?.items ?: emptyList()
                 },
                 onError = { e ->
                     Log.e("HomeViewModel", "Error fetching nasa photos ${e?.message}}", e)
                 }
             )
         }
+    }
+
+    fun updateFiltersAndCallApi(query: String) {
+        actualQuery = query
+        getNasaPhotos(query, "image")
     }
 
 }

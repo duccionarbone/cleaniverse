@@ -1,5 +1,6 @@
 package com.duccionarbone.cleanarchitectured.navigation
 
+import android.content.Context
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,10 @@ import com.duccionarbone.presentation.details.DetailScreen
 import com.duccionarbone.presentation.home.HomeViewModel
 import kotlinx.serialization.json.Json
 import androidx.compose.animation.SharedTransitionLayout
-import com.duccionarbone.presentation.SharedTransitionContent.SharedTransitionComponent
+import androidx.compose.ui.platform.LocalContext
+import coil.ImageLoader
+import coil.disk.DiskCache
+import coil.memory.MemoryCache
 import com.duccionarbone.presentation.home.HomeScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
@@ -27,34 +31,48 @@ fun AppNavigation(paddingValues: PaddingValues, homeViewModel: HomeViewModel) {
     val navController = rememberNavController()
 
     val uiState by homeViewModel.uiState.collectAsState()
-    val marsPhotos by homeViewModel.marsPhotos.collectAsState()
-    val nasaPhotos by homeViewModel.nasaPhotos.collectAsState()
+    //val marsPhotos by homeViewModel.marsPhotos.collectAsState()
+    //val nasaPhotos by homeViewModel.nasaPhotos.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        homeViewModel.getMarsPhotos("curiosity", 1000, "dixfIgjWWMjCmNjqpYTkHvZTCelNKPvPC6nih2Wq")
-        homeViewModel.getNasaPhotos("mars surface", "image")
+    fun createImageLoader(context: Context): ImageLoader {
+        return ImageLoader.Builder(context)
+            .memoryCache {
+                MemoryCache.Builder(context)
+                    .maxSizePercent(0.25) // 25% della memoria disponibile
+                    .build()
+            }
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(context.cacheDir.resolve("image_cache"))
+                    .maxSizePercent(0.02) // 2% dello spazio disponibile su disco
+                    .build()
+            }
+            .respectCacheHeaders(false) // Non usare le cache headers
+            .build()
     }
 
+    val imageLoader = createImageLoader(LocalContext.current)
 
+
+    LaunchedEffect(Unit){
+        homeViewModel.updateFiltersAndCallApi("mars")
+    }
+
+    SharedTransitionLayout {
         NavHost(navController, startDestination = "home") {
+
             composable("home") {
-                if (uiState == UiState.Success) {
-                    HomeScreen(paddingValues, navController, nasaPhotos)
-                } else {
-                    // Show a loading screen or some other UI while waiting for the photos to load
-                    //LoadingScreen()
-                }
+                HomeScreen(paddingValues, uiState, navController, imageLoader, this)
             }
             composable("detail/{nasaPhotoJson}") { backStackEntry ->
-                val serializedPhoto =
-                    backStackEntry.arguments?.getString("nasaPhotoJson")?.replace("$$$", "/")
+                val serializedPhoto = backStackEntry.arguments?.getString("nasaPhotoJson")?.replace("$$$", "/")
                 val nasaPhoto: NasaPhoto? = serializedPhoto?.let {
                     Json.decodeFromString<NasaPhoto>(it)
                 }
                 if (nasaPhoto != null) {
-                    //DetailScreen(paddingValues, nasaPhoto)
+                    DetailScreen(paddingValues, nasaPhoto, animatedVisibilityScope = this, imageLoader = imageLoader)
                 }
             }
         }
-
+    }
 }

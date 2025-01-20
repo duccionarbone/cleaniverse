@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,25 +29,22 @@ import com.duccionarbone.cleanarchitectured.domain.entities.Nasa.NasaPhoto
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun DetailScreen(
+fun SharedTransitionScope.DetailScreen(
     paddingValues: PaddingValues,
     nasaPhoto: NasaPhoto,
     imageLoader: ImageLoader,
-    onBack: () -> Unit,
     animatedVisibilityScope: AnimatedVisibilityScope,
-    sharedTransitionScope: SharedTransitionScope,
-    modifier: Modifier
 ) {
 
-    with(sharedTransitionScope){
-        Box(modifier=modifier.padding(top = 20.dp, bottom = 20.dp)) {
+
+        Box(modifier=Modifier.padding(top = 20.dp, bottom = 20.dp)) {
 
             Column(
                 modifier = Modifier
                     .padding(paddingValues)
                     .fillMaxSize()
                     .clickable {
-                        onBack()
+
                     }
             ) {
 
@@ -55,7 +53,7 @@ fun DetailScreen(
 
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                        text = nasaPhoto.data[0].title,
+                        text = nasaPhoto.data?.get(0)?.title ?: "",
                         style = MaterialTheme.typography.titleLarge,
                         color = Color.White
                     )
@@ -67,11 +65,14 @@ fun DetailScreen(
                             .crossfade(true)
                             .build(),
                         imageLoader = imageLoader,
-                        contentDescription = nasaPhoto.data[0].title,
+                        contentDescription = nasaPhoto.data?.get(0)?.title ?: "",
                         modifier = Modifier
                             .sharedElement(
-                                rememberSharedContentState(key = "image"),
-                                animatedVisibilityScope = animatedVisibilityScope
+                                rememberSharedContentState(key = "image{${nasaPhoto.href}"),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = { _, _ ->
+                                    tween(durationMillis = 500)
+                                }
                             )
                             .fillMaxWidth()
                             .height(400.dp),
@@ -83,25 +84,25 @@ fun DetailScreen(
 
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                        text = nasaPhoto.data[0].description,
+                        text = nasaPhoto.data?.get(0)?.description ?: "",
                         style = MaterialTheme.typography.titleMedium,
                         color = Color.White
                     )
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        text = nasaPhoto.data[0].secondary_creator,
+                        text = nasaPhoto.data?.get(0)?.secondary_creator ?: "",
                         style = MaterialTheme.typography.titleSmall,
                         color = Color.White
                     )
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        text = nasaPhoto.data[0].description_508,
+                        text = nasaPhoto.data?.get(0)?.description_508 ?: "",
                         style = MaterialTheme.typography.titleSmall,
                         color = Color.White
                     )
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp),
-                        text = nasaPhoto.data[0].date_created,
+                        text = nasaPhoto.data?.get(0)?.date_created ?: "",
                         style = MaterialTheme.typography.titleSmall,
                         color = Color.White
                     )
@@ -109,6 +110,6 @@ fun DetailScreen(
 
             }
         }
-    }
+
 
 }

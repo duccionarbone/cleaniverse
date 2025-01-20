@@ -20,7 +20,7 @@ data class Collection(
 @Serializable
 data class NasaPhoto(
     val href: String,
-    val data: List<Data>,
+    val data: List<Data>?,
     val links: List<Link>
 )
 @Serializable

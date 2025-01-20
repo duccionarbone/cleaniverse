@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.compose.material3)
