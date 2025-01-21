@@ -82,4 +82,4 @@ To get a local copy of the project up and running, follow these steps:
 
 ```sh
 
-git clone https://github.com/duccionarbone/Cleaniverse.git
+git clone https://github.com/duccionarbone/cleaniverse.git
