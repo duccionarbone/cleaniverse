@@ -16,7 +16,7 @@ Cleaniverse is an Android application that showcases images from NASA's API. The
 
   
 
-The project follows the Clean Architecture principles, which divides the codebase into four main modules:
+The project follows the Clean Architecture principles, which divides the codebase into four modules:
 
   
 
