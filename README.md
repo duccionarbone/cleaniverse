@@ -1,7 +1,6 @@
+![cleaniverseLogo](https://github.com/user-attachments/assets/5364b269-9939-409f-90d2-18733193fcc7)
 
 # Cleaniverse
-
-  
 
 Cleaniverse is an Android application that showcases images from NASA's API. The app is built using the Clean Architecture principles to ensure a scalable, maintainable, and testable codebase.
 
